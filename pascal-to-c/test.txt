@@ -1,0 +1,10 @@
+var
+	a, b : integer;
+	c : longint;
+begin
+	read(a, b);
+	a = 5;
+	b += a * 2.34;
+	writeln(a + b);
+	write('a=', a, ', (b-2)*3=', (b-2)*3);
+end.
