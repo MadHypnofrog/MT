@@ -20,6 +20,6 @@ public class Main {
         TokenStream tokens = new CommonTokenStream(lexer);
         testParser parser = new testParser(tokens);
         Visitor v = new Visitor();
-        System.out.println(v.visit(parser.program()));
+        System.out.println(v.visitProgram(parser.program()));
     }
 }

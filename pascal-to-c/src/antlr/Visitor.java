@@ -1,8 +1,5 @@
 package antlr;
 
-import antlr.testBaseVisitor;
-import antlr.testParser;
-import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -27,7 +24,7 @@ public class Visitor extends testBaseVisitor<String> {
                 for (ParseTree t: ctx.children) {
                     if (t.getPayload() instanceof testParser.ArithmeticContext) {
                         res.append("%d");
-                    } else if (t.getText().startsWith("'")) {  // чутка костыль
+                    } else if (t.getText().startsWith("'")) {
                         res.append(t.getText().replace("'", ""));
                     }
                 }
@@ -62,15 +59,32 @@ public class Visitor extends testBaseVisitor<String> {
             res = new StringBuilder(visitVariables(ctx.variables()));
             res.append("\n");
         }
+        for (testParser.FunctionContext f: ctx.function()) {
+            res.append(visitFunction(f));
+            res.append("\n\n");
+        }
         res.append("int main() {\n");
         res.append(visitCommands(ctx.commands()));
         res.append("return 0;\n}\n");
         return res.toString();
     }
 
-    public String visitDeclaration(testParser.DeclarationContext ctx) {
+    public String visitDeclaration(testParser.DeclarationContext ctx, boolean separate) {
         StringBuilder res = new StringBuilder();
-        switch (ctx.type().getText()) {
+        if (!separate) {
+            res.append(visitType(ctx.type()));
+            res.append(ctx.NAME().stream().map(t -> t.getSymbol().getText()).collect(Collectors.joining(", ")));
+        }
+        else {
+            res.append(ctx.NAME().stream().map(t -> visitType(ctx.type()) + t.getSymbol().getText())
+                    .collect(Collectors.joining(", ")));
+        }
+        return res.toString();
+    }
+
+    public String visitType(testParser.TypeContext ctx) {
+        StringBuilder res = new StringBuilder();
+        switch (ctx.getText()) {
             case "integer": {
                 res.append("short ");
                 break;
@@ -80,7 +94,7 @@ public class Visitor extends testBaseVisitor<String> {
                 break;
             }
             case "shortint": {
-                res.append("byte ");
+                res.append("char ");
                 break;
             }
             case "real": {
@@ -88,16 +102,36 @@ public class Visitor extends testBaseVisitor<String> {
                 break;
             }
         }
-        res.append(ctx.NAME().stream().map(t -> t.getSymbol().getText()).collect(Collectors.joining(", ")));
-        res.append(";");
         return res.toString();
     }
 
     public String visitVariables(testParser.VariablesContext ctx) {
         StringBuilder res = new StringBuilder();
         for (testParser.DeclarationContext c: ctx.declaration()) {
-            res.append(visitDeclaration(c)).append("\n");
+            res.append(visitDeclaration(c, false)).append(";\n");
         }
+        return res.toString();
+    }
+
+    public String visitFunction(testParser.FunctionContext ctx) {
+        StringBuilder res = new StringBuilder();
+        res.append(visitHeader(ctx.header()));
+        res.append("\n");
+        res.append(visitVariables(ctx.variables()));
+        res.append(visitCommands(ctx.commands()));
+        res.append("return ");
+        res.append(ctx.arithmetic().getText());
+        res.append(";\n}");
+        return res.toString();
+    }
+
+    public String visitHeader(testParser.HeaderContext ctx) {
+        StringBuilder res = new StringBuilder();
+        res.append(visitType(ctx.type()));
+        res.append(ctx.NAME().getSymbol().getText());
+        res.append("(");
+        res.append(ctx.declaration().stream().map(d -> visitDeclaration(d, true)).collect(Collectors.joining(", ")));
+        res.append(") {");
         return res.toString();
     }
 }

@@ -17,6 +17,18 @@ public interface testVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProgram(testParser.ProgramContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link testParser#function}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunction(testParser.FunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link testParser#header}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHeader(testParser.HeaderContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link testParser#variables}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
