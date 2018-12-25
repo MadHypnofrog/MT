@@ -1,10 +1,23 @@
 var
 	a, b : integer;
 	c : longint;
+	_d : real;
+	Ee0 : shortint;
+
+function x(a : integer; _d: real) : integer;
+var
+    y : longint;
+begin
+    y = a;
+    a += 2;
+    x := a;
+end;
 begin
 	read(a, b);
 	a = 5;
 	b += a * 2.34;
-	writeln(a + b);
+	writeln(x(a) + b);
+	x(b);
+	a = x(b);
 	write('a=', a, ', (b-2)*3=', (b-2)*3);
 end.

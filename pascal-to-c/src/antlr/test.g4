@@ -1,15 +1,23 @@
 grammar test;
 
 program
-    : (VAR variables)? BEGIN commands END
+    : (VAR variables)? (function)* BEGIN commands END '.'
+    ;
+
+function
+    : h=header (VAR variables)? BEGIN commands n=NAME COLON EQ arithmetic SEMICOLON END SEMICOLON {$h.name.equals($n.getText())}?
+    ;
+
+header returns [String name]
+    : FUNCTION n=NAME LPAR ((VAR)? declaration SEMICOLON)* (VAR)? declaration RPAR COLON type SEMICOLON {$name = $n.getText();}
     ;
 
 variables
-    : (declaration)+
+    : (declaration SEMICOLON)+
     ;
 
 declaration
-    : (NAME COMMA)* NAME COLON type SEMICOLON
+    : (NAME COMMA)* NAME COLON type
     ;
 
 type
@@ -27,6 +35,7 @@ command
     : NAME (PLUS | MINUS | DIV | MUL)? EQ arithmetic
     | READ LPAR (NAME COMMA)* NAME RPAR
     | (WRITE | WRITELN) LPAR ((arithmetic | STRING) COMMA)* (arithmetic | STRING) RPAR
+    | NAME LPAR ((NAME COMMA)* NAME)? RPAR
     ;
 
 arithmetic
@@ -37,6 +46,11 @@ arithmetic
     | LPAR arithmetic RPAR
     | NAME
     | NUMBER
+    | NAME LPAR ((NAME COMMA)* NAME)? RPAR
+    ;
+
+FUNCTION
+    : 'function'
     ;
 
 INTEGER
@@ -60,7 +74,7 @@ BEGIN
     ;
 
 END
-    : 'end.'
+    : 'end'
     ;
 
 VAR
@@ -129,7 +143,7 @@ STRING
     ;
 
 NUMBER
-    : [1-9][0-9]*([.0-9]+)?
+    : [1-9][0-9]*('.' [0-9]+)?
     ;
 
 NAME
