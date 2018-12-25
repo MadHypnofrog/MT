@@ -1,0 +1,66 @@
+grammar Test;
+
+!e [returns float a]:
+    t ea {$a = t.a + ea.a;}
+    ;
+ea [returns float a]:
+    PLUS t ea {$a = t.a + ea.a;}
+    | MINUS t ea {$a = ea.a - t.a;}
+    | {$a = 0;}
+    ;
+t [returns float a]
+    : d ta {$a = d.a * ta.a;}
+    ;
+ta [returns float a]
+    : MUL d ta {$a = d.a * ta.a;}
+    | DIV d ta {$a = ta.a/d.a;}
+    | {$a = 1;}
+    ;
+
+d [returns float a]
+    : f pa {$a = (float)Math.pow(f.a, pa.a);}
+    ;
+
+pa [returns float a]
+    : POWER f pa {$a = (float)Math.pow(f.a, pa.a);}
+    | {$a = 1;}
+    ;
+f [returns float a]
+    : NUMBER {$a = Integer.valueOf(NUMBER.value);}
+    | LB e RB {$a = e.a;}
+    ;
+
+PLUS
+    = '+'
+    ;
+
+MUL
+    = '*'
+    ;
+
+MINUS
+    = '-'
+    ;
+
+DIV
+    = '/'
+    ;
+
+POWER
+    = '^'
+    ;
+
+NUMBER
+    : '([1-9][0-9]*)|(0)'
+    ;
+
+LB
+    = '('
+    ;
+
+RB
+    = ')'
+    ;
+
+WS -> '[ \t\r\n]'
+    ;

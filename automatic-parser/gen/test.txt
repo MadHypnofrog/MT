@@ -1,0 +1,25 @@
+grammar Test;
+
+!start [returns int a]
+    : left PLUS right ({1, 2}) {$a = $left.value + $right.value;}
+    ;
+
+left [returns int value, boolean sign]
+    : NUMBER {$value = Integer.valueOf($NUMBER.text); $sign = true;}
+    |
+    ;
+
+right (int a, int b) [returns int value]
+    : NUMBER {$value = Integer.valueOf($NUMBER.text) + a + b;}
+    ;
+
+PLUS
+    = '+'
+    ;
+
+NUMBER
+    : '[1-9][0-9]*'
+    ;
+
+WS -> '[ \t\r\n]'
+    ;
